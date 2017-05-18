@@ -2,8 +2,10 @@ import json
 import unittest
 
 from flask import Flask 
+from mock import patch
 
 from business_controller import business_controller
+from models.requests import CreateBusinessRequest
 
 app = Flask(__name__)
 
@@ -45,6 +47,15 @@ class TestBusinessController(unittest.TestCase):
         response = self.app.post("/", data = d, content_type="application/json")
 
         self.assertEqual(response.status_code, 200)
+
+    @patch.object(CreateBusinessRequest, 'validate')
+    def test_create_calls_request_validate(self, mock):
+        mock.return_value = []
+
+        d = json.dumps({})
+        self.app.post("/", data = d, content_type="application/json")
+
+        self.assertTrue(mock.called)
 
 if __name__ == "__main__":
     unittest.main()
